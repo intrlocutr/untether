@@ -1,12 +1,3 @@
-/*import 'package:flutter/material.dart';
-
-/// A report for a specific date range.
-class RangeReport {
-  /// The time span of the reports.
-  late final DateTimeRange range;
-  late final List<Report> reports;
-}*/
-
 /// A report for a single day.
 class Report {
   /// Timestamp of this report.

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:untether/model/reports.dart';
@@ -83,5 +84,17 @@ class ReportDatabase {
         where: 'timestamp = ?',
         whereArgs: [report.timestamp.millisecondsSinceEpoch]
     );
+  }
+
+  /// Reads the reports within the range.
+  Future<Iterable<Report>> readReports(DateTimeRange range) async {
+    Database? db = await _instance.database;
+
+    final List<Map<String, dynamic>> q = await db!.query(
+        _tblName,
+        where: 'timestamp BETWEEN ${range.start.millisecondsSinceEpoch} AND ${range.end.millisecondsSinceEpoch}'
+    );
+
+    return q.map((Map<String, dynamic> r) => Report.fromMap(r));
   }
 }
