@@ -10,7 +10,7 @@ void main() {
   runApp(
     MaterialApp(
       restorationScopeId: 'app',
-      title: 'Named Routes Demo',
+      title: 'Untether',
       // Start the app with the "/" named route. In this case, the app starts
       // on the FirstScreen widget.
       initialRoute: '/',
@@ -37,7 +37,7 @@ class _HomePageState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HomeScreen'),
+        title: const Text('Welcome to Untether'),
       ),
       body: Center(
         child: ButtonBar(
@@ -152,9 +152,9 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
   String? get restorationId => widget.restorationId;
 
   final RestorableDateTimeN _startDate =
-      RestorableDateTimeN(DateTime(2021, 1, 1));
+      RestorableDateTimeN(DateTime.now().subtract(const Duration(days: 7)));
   final RestorableDateTimeN _endDate =
-      RestorableDateTimeN(DateTime(2021, 1, 5));
+      RestorableDateTimeN(DateTime.now());
   late final RestorableRouteFuture<DateTimeRange?>
       _restorableDateRangePickerRouteFuture =
       RestorableRouteFuture<DateTimeRange?>(
