@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:untether/db/provider.dart';
+import 'package:untether/model/reports.dart';
+
+late ReportDatabase reportDb;
 
 void main() {
+  reportDb = ReportDatabase();
   runApp(
     MaterialApp(
       restorationScopeId: 'app',
@@ -70,7 +75,7 @@ class SurveyPage extends StatefulWidget {
 
 class _SurveyPageState extends State {
   double _currentSliderValue = 0.5;
-
+  String _currentTimeSpentValue = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +92,13 @@ class _SurveyPageState extends State {
                 decoration: const InputDecoration(
                     labelText: "Time spent on Social Media in minutes"),
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly]),
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (String value) {
+                  setState(() {
+                  _currentTimeSpentValue = value;
+                  });
+                },
+            ),
             Slider(
               value: _currentSliderValue,
               min: 0,
@@ -114,7 +125,8 @@ class _SurveyPageState extends State {
                   child: const Text('Submit'),
                   style: ElevatedButton.styleFrom(elevation: 8.0),
                   onPressed: () {
-                    // Navigate to the second screen using a named route.
+                    Report report = Report(score: _currentSliderValue, timestamp: DateTime.now(),usageMinutes: int.parse(_currentTimeSpentValue));
+                    reportDb.insertReport(report);
                   },
                 ),
               ],
