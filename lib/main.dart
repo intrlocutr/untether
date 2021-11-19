@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+//import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:untether/db/provider.dart';
 import 'package:untether/model/questions.dart';
 import 'package:untether/model/reports.dart';
@@ -77,9 +78,9 @@ class SurveyPage extends StatefulWidget {
 }
 
 class _SurveyPageState extends State {
+  bool isChecked = false;
   List<SurveyAnswer?> surveyAnswersList =
       List.filled(untetherQuestions.questions.length, null);
-  double _currentSliderValue = 0.5;
   String _currentTimeSpentValue = "";
 //
   @override
@@ -131,16 +132,27 @@ class _SurveyPageState extends State {
               ]),
             ),
             Container(
-              child: Slider(
-                value: _currentSliderValue,
-                min: 0,
-                max: 1,
-                divisions: 100,
-                onChanged: (double value) {
-                  setState(() {
-                    _currentSliderValue = value;
-                  });
-                },
+              child:
+              Row(
+                children: <Widget>[
+                  const SizedBox(
+                    width: 10,
+                  ), //SizedBox
+                  const Text(
+                    'External Factors: ',
+                    style: TextStyle(fontSize: 17.0),
+                  ), //Text
+                  const SizedBox(width: 10), //SizedBox
+                  /** Checkbox Widget **/
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value!;
+                      });
+                    },
+                  ), //Checkbox
+                ], //<Widget>[]
               ),
             ),
             Container(
@@ -160,9 +172,11 @@ class _SurveyPageState extends State {
                     style: ElevatedButton.styleFrom(elevation: 8.0),
                     onPressed: () {
                       Report report = Report(
-                          score: _currentSliderValue,
+                          score: untetherQuestions.scoreSurvey(surveyAnswersList),
                           timestamp: DateTime.now(),
-                          usageMinutes: int.parse(_currentTimeSpentValue));
+                          usageMinutes: int.parse(_currentTimeSpentValue),
+                          externalFactor: isChecked,
+                      );
                       reportDb.insertReport(report);
                     },
                   ),
@@ -194,21 +208,22 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
   late final RestorableRouteFuture<DateTimeRange?>
       _restorableDateRangePickerRouteFuture =
       RestorableRouteFuture<DateTimeRange?>(
-    onComplete: _selectDateRange,
-    onPresent: (NavigatorState navigator, Object? arguments) {
-      return navigator
+        onComplete: _selectDateRange,
+        onPresent: (NavigatorState navigator, Object? arguments) {
+          return navigator
           .restorablePush(_dateRangePickerRoute, arguments: <String, dynamic>{
-        'initialStartDate': _startDate.value?.millisecondsSinceEpoch,
-        'initialEndDate': _endDate.value?.millisecondsSinceEpoch,
-      });
-    },
-  );
+            'initialStartDate': _startDate.value?.millisecondsSinceEpoch,
+            'initialEndDate': _endDate.value?.millisecondsSinceEpoch,
+          });
+        },
+      );
 
   void _selectDateRange(DateTimeRange? newSelectedDate) {
     if (newSelectedDate != null) {
       setState(() {
         _startDate.value = newSelectedDate.start;
         _endDate.value = newSelectedDate.end;
+
       });
     }
   }
@@ -239,6 +254,7 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
       },
     );
   }
+
 
   static DateTimeRange? _initialDateTimeRange(Map<dynamic, dynamic> arguments) {
     if (arguments['initialStartDate'] != null &&
