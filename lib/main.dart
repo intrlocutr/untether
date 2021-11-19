@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untether/db/provider.dart';
+import 'package:untether/model/questions.dart';
 import 'package:untether/model/reports.dart';
+import 'package:untether/model/survey.dart';
+// import 'package:syncfusion_flutter_charts/charts.dart';
 
 late ReportDatabase reportDb;
 
@@ -74,65 +77,99 @@ class SurveyPage extends StatefulWidget {
 }
 
 class _SurveyPageState extends State {
+  List<SurveyAnswer?> surveyAnswersList =
+      List.filled(untetherQuestions.questions.length, null);
   double _currentSliderValue = 0.5;
   String _currentTimeSpentValue = "";
+//
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Survey'),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(40.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            TextField(
-                decoration: const InputDecoration(
-                    labelText: "Time spent on Social Media in minutes"),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onChanged: (String value) {
+      body: ListView(
+        children: List.generate(untetherQuestions.questions.length, (index) {
+          var question = untetherQuestions.questions[index];
+          return Container(
+              child: Column(children: [
+            Text(
+              question.question,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Column(
+                children: question.answers.map((answer) {
+              return RadioListTile<SurveyAnswer>(
+                title: Text(answer.answer),
+                value: answer,
+                groupValue: surveyAnswersList[index],
+                onChanged: (SurveyAnswer? value) {
                   setState(() {
-                  _currentTimeSpentValue = value;
+                    surveyAnswersList[index] = value;
                   });
                 },
-            ),
-            Slider(
-              value: _currentSliderValue,
-              min: 0,
-              max: 1,
-              divisions: 100,
-              onChanged: (double value) {
-                setState(() {
-                  _currentSliderValue = value;
-                });
-              },
-            ),
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text('Home'),
-                  style: ElevatedButton.styleFrom(elevation: 8.0),
-                  onPressed: () {
-                    // Navigate to the second screen using a named route.
-                    Navigator.pop(context);
+              );
+            }).toList()),
+          ]));
+        })
+          ..addAll([
+            Container(
+              child: Column(children: [
+                TextField(
+                  decoration: const InputDecoration(
+                      labelText: "Time spent on Social Media in minutes"),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (String value) {
+                    setState(() {
+                      _currentTimeSpentValue = value;
+                    });
                   },
                 ),
-                ElevatedButton(
-                  child: const Text('Submit'),
-                  style: ElevatedButton.styleFrom(elevation: 8.0),
-                  onPressed: () {
-                    Report report = Report(score: _currentSliderValue, timestamp: DateTime.now(),usageMinutes: int.parse(_currentTimeSpentValue));
-                    reportDb.insertReport(report);
-                  },
-                ),
-              ],
+              ]),
             ),
-          ],
-        ),
+            Container(
+              child: Slider(
+                value: _currentSliderValue,
+                min: 0,
+                max: 1,
+                divisions: 100,
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                  });
+                },
+              ),
+            ),
+            Container(
+              child: ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    child: const Text('Home'),
+                    style: ElevatedButton.styleFrom(elevation: 8.0),
+                    onPressed: () {
+                      // Navigate to the second screen using a named route.
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Submit'),
+                    style: ElevatedButton.styleFrom(elevation: 8.0),
+                    onPressed: () {
+                      Report report = Report(
+                          score: _currentSliderValue,
+                          timestamp: DateTime.now(),
+                          usageMinutes: int.parse(_currentTimeSpentValue));
+                      reportDb.insertReport(report);
+                    },
+                  ),
+                ],
+              ),
+            )
+          ]),
       ),
     );
   }
@@ -153,8 +190,7 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
 
   final RestorableDateTimeN _startDate =
       RestorableDateTimeN(DateTime.now().subtract(const Duration(days: 7)));
-  final RestorableDateTimeN _endDate =
-      RestorableDateTimeN(DateTime.now());
+  final RestorableDateTimeN _endDate = RestorableDateTimeN(DateTime.now());
   late final RestorableRouteFuture<DateTimeRange?>
       _restorableDateRangePickerRouteFuture =
       RestorableRouteFuture<DateTimeRange?>(
@@ -220,7 +256,6 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reports'),
@@ -232,7 +267,6 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
             child: const Text('Dates'),
             style: ElevatedButton.styleFrom(elevation: 8.0),
             onPressed: () {
-              // Navigate to the second screen using a named route.
               _restorableDateRangePickerRouteFuture.present();
             },
           ),
