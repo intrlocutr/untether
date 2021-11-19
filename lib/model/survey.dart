@@ -33,18 +33,15 @@ class SurveySchema {
   /// The questions to be asked by this survey;
   final List<SurveyQuestion> questions;
 
-  /// The maximum possible score for this survey.
-  double get maxScore {
-    double max = 0;
-    for (var q in questions) {
-      max += q.maxPoints;
-    }
-    return max;
-  }
-
   /// Score the survey with the given answers.
-  double score(List<double> answers) {
-    return answers.reduce((a, b) => a + b) / maxScore;
+  double scoreSurvey(List<SurveyAnswer> answers) {
+    double max = 0;
+    double score = 0;
+    for (var i = 0; i < questions.length; i++) {
+      max += questions[i].maxPoints;
+      score += answers[i].pointValue;
+    }
+    return score / max;
   }
 
   SurveySchema({required this.questions});
