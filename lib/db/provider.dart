@@ -8,7 +8,7 @@ class ReportDatabase {
   // Constants used by the database.
   static const String _dbName = 'report_database.db';
   static const String _tblName = 'report';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
 
   // The ReportDatabase model will be a singleton.
   ReportDatabase._privateConstructor();
@@ -33,7 +33,7 @@ class ReportDatabase {
 
   Future _onCreate(Database db, int version) {
     return db.execute(
-      'CREATE TABLE $_tblName(timestamp INTEGER PRIMARY KEY, usageMinutes INTEGER, score DOUBLE)',
+      'CREATE TABLE $_tblName(timestamp INTEGER PRIMARY KEY, usageMinutes INTEGER, score DOUBLE, externalFactor INTEGER)',
     );
   }
 
