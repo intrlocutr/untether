@@ -34,12 +34,12 @@ class SurveySchema {
   final List<SurveyQuestion> questions;
 
   /// Score the survey with the given answers.
-  double scoreSurvey(List<SurveyAnswer> answers) {
+  double scoreSurvey(List<SurveyAnswer?> answers) {
     double max = 0;
     double score = 0;
     for (var i = 0; i < questions.length; i++) {
       max += questions[i].maxPoints;
-      score += answers[i].pointValue;
+      score += answers[i]!.pointValue;
     }
     return score / max;
   }
