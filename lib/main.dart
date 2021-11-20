@@ -97,13 +97,13 @@ class _SurveyPageState extends State {
             Text(
               question.question,
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              overflow: TextOverflow.visible,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
             Column(
                 children: question.answers.map((answer) {
               return RadioListTile<SurveyAnswer>(
-                title: Text(answer.answer),
+                title: Text(answer.answer, overflow: TextOverflow.visible),
                 value: answer,
                 groupValue: surveyAnswersList[index],
                 onChanged: (SurveyAnswer? value) {
