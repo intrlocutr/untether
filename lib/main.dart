@@ -154,13 +154,6 @@ class _SurveyPageState extends State {
               alignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  child: const Text('Home'),
-                  style: ElevatedButton.styleFrom(elevation: 8.0),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ElevatedButton(
                   child: const Text('Submit'),
                   style: ElevatedButton.styleFrom(elevation: 8.0),
                   onPressed: () {
@@ -171,6 +164,7 @@ class _SurveyPageState extends State {
                       externalFactor: isChecked,
                     );
                     reportDb.insertReport(report);
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -320,12 +314,6 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
                 _restorableDateRangePickerRouteFuture.present();
               },
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Home'),
-            ),
           ],
         ),
         chartData.isNotEmpty
@@ -333,7 +321,7 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
                 height: 200, child: SimpleBarChart.withData(chartData))
             : const SizedBox.shrink(),
         const Text(
-          'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors. ',
+          'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors.',
           textAlign: TextAlign.center,
           overflow: TextOverflow.visible,
           style: TextStyle(fontWeight: FontWeight.bold),
