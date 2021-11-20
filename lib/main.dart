@@ -45,14 +45,12 @@ class _HomePageState extends State {
           children: [
             ElevatedButton(
               child: const Text('Survey'),
-              style: ElevatedButton.styleFrom(elevation: 8.0),
               onPressed: () {
                 Navigator.pushNamed(context, '/survey');
               },
             ),
             ElevatedButton(
               child: const Text('Reports'),
-              style: ElevatedButton.styleFrom(elevation: 8.0),
               onPressed: () {
                 Navigator.pushNamed(context, '/report');
               },
@@ -155,7 +153,6 @@ class _SurveyPageState extends State {
               children: [
                 ElevatedButton(
                   child: const Text('Submit'),
-                  style: ElevatedButton.styleFrom(elevation: 8.0),
                   onPressed: () {
                     Report report = Report(
                       score: untetherQuestions.scoreSurvey(surveyAnswersList),
@@ -308,8 +305,7 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
           alignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              child: const Text('Dates'),
-              style: ElevatedButton.styleFrom(elevation: 8.0),
+              child: const Text('Select Dates'),
               onPressed: () {
                 _restorableDateRangePickerRouteFuture.present();
               },
