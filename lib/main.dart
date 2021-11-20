@@ -227,8 +227,8 @@ class SimpleBarChart extends StatelessWidget {
     return [
       charts.Series<Report, String>(
         id: 'Report',
-        colorFn: (Report report, _) => colors[scores.indexOf(report.score)],
-        domainFn: (Report report, _) => report.timestamp.toString(),
+        colorFn: (Report report, _) => report.externalFactor ? charts.MaterialPalette.black : colors[scores.indexOf(report.score)],
+        domainFn: (Report report, _) => report.timestamp.toString()/*.split(' ')[0]*/,
         measureFn: (Report report, _) => report.usageMinutes,
         data: data,
       )
