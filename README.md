@@ -1,16 +1,5 @@
 # untether
 
-A new Flutter project.
+This is a simple app for keeping track of your social media usage and mental health on certain days. It does this by way of a short survey and visualizes the results on demand.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app was made as a rapid prototype for Design Thinking in Technology at the Purdue Polytechnic Institute.
