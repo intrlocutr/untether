@@ -45,7 +45,7 @@ class SimpleBarChart extends StatelessWidget {
             ? charts.MaterialPalette.black
             : colors[scores.indexOf(report.score)],
         domainFn: (Report report, _) =>
-            report.timestamp.toString()/*.split(' ')[0]*/,
+            report.timestamp.toString().split(' ')[0],
         measureFn: (Report report, _) => report.usageMinutes,
         data: data,
       )
