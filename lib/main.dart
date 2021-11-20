@@ -338,7 +338,13 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
           ),
           chartData.isNotEmpty
               ? Container(height: 200, child: SimpleBarChart.withSampleData(chartData))
-              : const SizedBox.shrink()
+              : const SizedBox.shrink(),
+          const Text(
+            'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors. ',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.visible,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ]));
   }
 }
