@@ -25,7 +25,7 @@ class Report {
       : timestamp = DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
         usageMinutes = map['usageMinutes'],
         score = map['score'],
-        externalFactor = map['externalFactor'] as bool;
+        externalFactor = map['externalFactor'] == 1;
 
   /// Converts the `Report` to a `Map` for inserting into a database.
   Map<String, dynamic> toMap() {
@@ -33,7 +33,7 @@ class Report {
       'timestamp': timestamp.millisecondsSinceEpoch,
       'usageMinutes': usageMinutes,
       'score': score,
-      'externalFactor': externalFactor as int
+      'externalFactor': externalFactor ? 1 : 0
     };
   }
 
