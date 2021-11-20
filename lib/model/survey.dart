@@ -19,7 +19,7 @@ class SurveyQuestion {
     for (var a in answers) {
       if (a.pointValue > max) max = a.pointValue;
     }
-    return max * weight;
+    return max;
   }
 
   SurveyQuestion({
