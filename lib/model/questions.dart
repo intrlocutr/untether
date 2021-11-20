@@ -39,6 +39,7 @@ SurveySchema untetherQuestions = SurveySchema(
       SurveyAnswer(answer: 'No', pointValue: 0),
     ]),
     SurveyQuestion(question: 'How many times did you view topics that made you feel these emotions?', weight: 0.1, answers: <SurveyAnswer>[
+      SurveyAnswer(answer: '0', pointValue: 0),
       SurveyAnswer(answer: '1', pointValue: 1),
       SurveyAnswer(answer: '2', pointValue: 2),
       SurveyAnswer(answer: '3', pointValue: 3),
