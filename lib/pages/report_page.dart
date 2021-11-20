@@ -100,13 +100,14 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
     return DialogRoute<DateTimeRange?>(
       context: context,
       builder: (BuildContext context) {
+        DateTime today = DateTime.now();
         return DateRangePickerDialog(
           restorationId: 'date_picker_dialog',
           initialDateRange:
           _initialDateTimeRange(arguments! as Map<dynamic, dynamic>),
-          firstDate: DateTime(2021, 1, 1),
-          currentDate: DateTime(2021, 1, 25),
-          lastDate: DateTime(2022, 1, 1),
+          firstDate: DateTime(today.year, today.month, 1),
+          currentDate: today,
+          lastDate: today.add(const Duration(days: 30)),
         );
       },
     );
