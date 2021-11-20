@@ -222,12 +222,14 @@ class SimpleBarChart extends StatelessWidget {
 
   /// Create one series with sample hard coded data.
   static List<charts.Series<Report, String>> _translateData(List<Report> data) {
+    List<double> scores = data.map((r) => r.score).toList()..sort();
+    var colors = charts.MaterialPalette.blue.makeShades(scores.length);
     return [
       charts.Series<Report, String>(
-        id: 'Sales',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (Report sales, _) => sales.timestamp.toString(),
-        measureFn: (Report sales, _) => sales.usageMinutes,
+        id: 'Report',
+        colorFn: (Report report, _) => colors[scores.indexOf(report.score)],
+        domainFn: (Report report, _) => report.timestamp.toString(),
+        measureFn: (Report report, _) => report.usageMinutes,
         data: data,
       )
     ];
