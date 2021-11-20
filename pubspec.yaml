@@ -48,6 +48,7 @@ dev_dependencies:
 
   sqflite:
   path:
+  charts_flutter:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

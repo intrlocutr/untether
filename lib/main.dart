@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:untether/db/provider.dart';
 import 'package:untether/model/questions.dart';
 import 'package:untether/model/reports.dart';
 import 'package:untether/model/survey.dart';
-// import 'package:syncfusion_flutter_charts/charts.dart';
 
 late ReportDatabase reportDb;
+List<Report> chartData = [];
 
 void main() {
   reportDb = ReportDatabase();
@@ -132,8 +132,7 @@ class _SurveyPageState extends State {
               ]),
             ),
             Container(
-              child:
-              Row(
+              child: Row(
                 children: <Widget>[
                   const SizedBox(
                     width: 10,
@@ -172,10 +171,10 @@ class _SurveyPageState extends State {
                     style: ElevatedButton.styleFrom(elevation: 8.0),
                     onPressed: () {
                       Report report = Report(
-                          score: untetherQuestions.scoreSurvey(surveyAnswersList),
-                          timestamp: DateTime.now(),
-                          usageMinutes: int.parse(_currentTimeSpentValue),
-                          externalFactor: isChecked,
+                        score: untetherQuestions.scoreSurvey(surveyAnswersList),
+                        timestamp: DateTime.now(),
+                        usageMinutes: int.parse(_currentTimeSpentValue),
+                        externalFactor: isChecked,
                       );
                       reportDb.insertReport(report);
                     },
@@ -198,6 +197,43 @@ class ReportPage extends StatefulWidget {
   _ReportPageState createState() => _ReportPageState();
 }
 
+class SimpleBarChart extends StatelessWidget {
+  final List<charts.Series<dynamic, String>> seriesList;
+  final bool animate;
+
+  SimpleBarChart(this.seriesList, {required this.animate});
+
+  /// Creates a [BarChart] with sample data and no transition.
+  factory SimpleBarChart.withSampleData(List<Report> data) {
+    return SimpleBarChart(
+      _translateData(data),
+      // Disable animations for image tests.
+      animate: false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return charts.BarChart(
+      seriesList,
+      animate: animate,
+    );
+  }
+
+  /// Create one series with sample hard coded data.
+  static List<charts.Series<Report, String>> _translateData(List<Report> data) {
+    return [
+      charts.Series<Report, String>(
+        id: 'Sales',
+        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        domainFn: (Report sales, _) => sales.timestamp.toString(),
+        measureFn: (Report sales, _) => sales.usageMinutes,
+        data: data,
+      )
+    ];
+  }
+}
+
 class _ReportPageState extends State<ReportPage> with RestorationMixin {
   @override
   String? get restorationId => widget.restorationId;
@@ -208,22 +244,23 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
   late final RestorableRouteFuture<DateTimeRange?>
       _restorableDateRangePickerRouteFuture =
       RestorableRouteFuture<DateTimeRange?>(
-        onComplete: _selectDateRange,
-        onPresent: (NavigatorState navigator, Object? arguments) {
-          return navigator
+    onComplete: _selectDateRange,
+    onPresent: (NavigatorState navigator, Object? arguments) {
+      return navigator
           .restorablePush(_dateRangePickerRoute, arguments: <String, dynamic>{
-            'initialStartDate': _startDate.value?.millisecondsSinceEpoch,
-            'initialEndDate': _endDate.value?.millisecondsSinceEpoch,
-          });
-        },
-      );
+        'initialStartDate': _startDate.value?.millisecondsSinceEpoch,
+        'initialEndDate': _endDate.value?.millisecondsSinceEpoch,
+      });
+    },
+  );
 
-  void _selectDateRange(DateTimeRange? newSelectedDate) {
+  void _selectDateRange(DateTimeRange? newSelectedDate) async {
     if (newSelectedDate != null) {
+      Iterable<Report> newVariable = await reportDb.readReports(DateTimeRange(start: newSelectedDate.start, end: newSelectedDate.end));
+      chartData = newVariable.toList();
       setState(() {
         _startDate.value = newSelectedDate.start;
         _endDate.value = newSelectedDate.end;
-
       });
     }
   }
@@ -255,7 +292,6 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
     );
   }
 
-
   static DateTimeRange? _initialDateTimeRange(Map<dynamic, dynamic> arguments) {
     if (arguments['initialStartDate'] != null &&
         arguments['initialEndDate'] != null) {
@@ -273,30 +309,34 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reports'),
-      ),
-      body: ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            child: const Text('Dates'),
-            style: ElevatedButton.styleFrom(elevation: 8.0),
-            onPressed: () {
-              _restorableDateRangePickerRouteFuture.present();
-            },
+        appBar: AppBar(
+          title: const Text('Reports'),
+        ),
+        body: Column(children: [
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                child: const Text('Dates'),
+                style: ElevatedButton.styleFrom(elevation: 8.0),
+                onPressed: () {
+                  _restorableDateRangePickerRouteFuture.present();
+                },
+              ),
+              ElevatedButton(
+                // Within the SecondScreen widget
+                onPressed: () {
+                  // Navigate back to the first screen by popping the current route
+                  // off the stack.
+                  Navigator.pop(context);
+                },
+                child: const Text('Home'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            // Within the SecondScreen widget
-            onPressed: () {
-              // Navigate back to the first screen by popping the current route
-              // off the stack.
-              Navigator.pop(context);
-            },
-            child: const Text('Home'),
-          ),
-        ],
-      ),
-    );
+          chartData.isNotEmpty
+              ? Container(height: 200, child: SimpleBarChart.withSampleData(chartData))
+              : const SizedBox.shrink()
+        ]));
   }
 }
