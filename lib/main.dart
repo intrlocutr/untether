@@ -15,13 +15,9 @@ void main() {
     MaterialApp(
       restorationScopeId: 'app',
       title: 'Untether',
-      // Start the app with the "/" named route. In this case, the app starts
-      // on the FirstScreen widget.
       initialRoute: '/',
       routes: {
-        // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => const HomePage(),
-        // When navigating to the "/second" route, build the SecondScreen widget.
         '/survey': (context) => const SurveyPage(),
         '/report': (context) => const ReportPage(restorationId: 'main'),
       },
@@ -51,7 +47,6 @@ class _HomePageState extends State {
               child: const Text('Survey'),
               style: ElevatedButton.styleFrom(elevation: 8.0),
               onPressed: () {
-                // Navigate to the second screen using a named route.
                 Navigator.pushNamed(context, '/survey');
               },
             ),
@@ -59,7 +54,6 @@ class _HomePageState extends State {
               child: const Text('Reports'),
               style: ElevatedButton.styleFrom(elevation: 8.0),
               onPressed: () {
-                // Navigate to the second screen using a named route.
                 Navigator.pushNamed(context, '/report');
               },
             ),
@@ -82,7 +76,7 @@ class _SurveyPageState extends State {
   List<SurveyAnswer?> surveyAnswersList =
       List.filled(untetherQuestions.questions.length, null);
   String _currentTimeSpentValue = "";
-//
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,95 +87,95 @@ class _SurveyPageState extends State {
         children: List.generate(untetherQuestions.questions.length, (index) {
           var question = untetherQuestions.questions[index];
           return Container(
-              child: Column(children: [
-            Text(
-              question.question,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-            ),
-            Column(
+            child: Column(children: [
+              Text(
+                question.question,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+              ),
+              Column(
                 children: question.answers.map((answer) {
-              return RadioListTile<SurveyAnswer>(
-                title: Text(answer.answer, overflow: TextOverflow.visible),
-                value: answer,
-                groupValue: surveyAnswersList[index],
-                onChanged: (SurveyAnswer? value) {
+                  return RadioListTile<SurveyAnswer>(
+                    title: Text(answer.answer, overflow: TextOverflow.visible),
+                    value: answer,
+                    groupValue: surveyAnswersList[index],
+                    onChanged: (SurveyAnswer? value) {
+                      setState(() {
+                        surveyAnswersList[index] = value;
+                      });
+                    },
+                  );
+                }).toList()
+              ),
+            ])
+          );
+        })..addAll([
+          Container(
+            child: Column(children: [
+              TextField(
+                decoration: const InputDecoration(
+                    labelText: "Time spent on Social Media in minutes"),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (String value) {
                   setState(() {
-                    surveyAnswersList[index] = value;
+                    _currentTimeSpentValue = value;
                   });
                 },
-              );
-            }).toList()),
-          ]));
-        })
-          ..addAll([
-            Container(
-              child: Column(children: [
-                TextField(
-                  decoration: const InputDecoration(
-                      labelText: "Time spent on Social Media in minutes"),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  onChanged: (String value) {
+              ),
+            ]),
+          ),
+          Container(
+            child: Row(
+              children: <Widget>[
+                const SizedBox(
+                  width: 10,
+                ),
+                const Text(
+                  'External Factors: ',
+                  style: TextStyle(fontSize: 17.0),
+                ),
+                const SizedBox(width: 10),
+                Checkbox(
+                  value: isChecked,
+                  onChanged: (bool? value) {
                     setState(() {
-                      _currentTimeSpentValue = value;
+                      isChecked = value!;
                     });
                   },
                 ),
-              ]),
+              ],
             ),
-            Container(
-              child: Row(
-                children: <Widget>[
-                  const SizedBox(
-                    width: 10,
-                  ), //SizedBox
-                  const Text(
-                    'External Factors: ',
-                    style: TextStyle(fontSize: 17.0),
-                  ), //Text
-                  const SizedBox(width: 10), //SizedBox
-                  /** Checkbox Widget **/
-                  Checkbox(
-                    value: isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
-                    },
-                  ), //Checkbox
-                ], //<Widget>[]
-              ),
+          ),
+          Container(
+            child: ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  child: const Text('Home'),
+                  style: ElevatedButton.styleFrom(elevation: 8.0),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('Submit'),
+                  style: ElevatedButton.styleFrom(elevation: 8.0),
+                  onPressed: () {
+                    Report report = Report(
+                      score: untetherQuestions.scoreSurvey(surveyAnswersList),
+                      timestamp: DateTime.now(),
+                      usageMinutes: int.parse(_currentTimeSpentValue),
+                      externalFactor: isChecked,
+                    );
+                    reportDb.insertReport(report);
+                  },
+                ),
+              ],
             ),
-            Container(
-              child: ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    child: const Text('Home'),
-                    style: ElevatedButton.styleFrom(elevation: 8.0),
-                    onPressed: () {
-                      // Navigate to the second screen using a named route.
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ElevatedButton(
-                    child: const Text('Submit'),
-                    style: ElevatedButton.styleFrom(elevation: 8.0),
-                    onPressed: () {
-                      Report report = Report(
-                        score: untetherQuestions.scoreSurvey(surveyAnswersList),
-                        timestamp: DateTime.now(),
-                        usageMinutes: int.parse(_currentTimeSpentValue),
-                        externalFactor: isChecked,
-                      );
-                      reportDb.insertReport(report);
-                    },
-                  ),
-                ],
-              ),
-            )
+          )
           ]),
       ),
     );
@@ -203,11 +197,9 @@ class SimpleBarChart extends StatelessWidget {
 
   SimpleBarChart(this.seriesList, {required this.animate});
 
-  /// Creates a [BarChart] with sample data and no transition.
-  factory SimpleBarChart.withSampleData(List<Report> data) {
+  factory SimpleBarChart.withData(List<Report> data) {
     return SimpleBarChart(
       _translateData(data),
-      // Disable animations for image tests.
       animate: false,
     );
   }
@@ -220,15 +212,17 @@ class SimpleBarChart extends StatelessWidget {
     );
   }
 
-  /// Create one series with sample hard coded data.
   static List<charts.Series<Report, String>> _translateData(List<Report> data) {
     List<double> scores = data.map((r) => r.score).toList()..sort();
     var colors = charts.MaterialPalette.blue.makeShades(scores.length);
     return [
       charts.Series<Report, String>(
         id: 'Report',
-        colorFn: (Report report, _) => report.externalFactor ? charts.MaterialPalette.black : colors[scores.indexOf(report.score)],
-        domainFn: (Report report, _) => report.timestamp.toString()/*.split(' ')[0]*/,
+        colorFn: (Report report, _) => report.externalFactor
+            ? charts.MaterialPalette.black
+            : colors[scores.indexOf(report.score)],
+        domainFn: (Report report, _) =>
+            report.timestamp.toString()/*.split(' ')[0]*/,
         measureFn: (Report report, _) => report.usageMinutes,
         data: data,
       )
@@ -258,7 +252,8 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
 
   void _selectDateRange(DateTimeRange? newSelectedDate) async {
     if (newSelectedDate != null) {
-      Iterable<Report> newVariable = await reportDb.readReports(DateTimeRange(start: newSelectedDate.start, end: newSelectedDate.end));
+      Iterable<Report> newVariable = await reportDb.readReports(DateTimeRange(
+          start: newSelectedDate.start, end: newSelectedDate.end));
       chartData = newVariable.toList();
       setState(() {
         _startDate.value = newSelectedDate.start;
@@ -311,40 +306,39 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Reports'),
+      appBar: AppBar(
+        title: const Text('Reports'),
+      ),
+      body: Column(children: [
+        ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              child: const Text('Dates'),
+              style: ElevatedButton.styleFrom(elevation: 8.0),
+              onPressed: () {
+                _restorableDateRangePickerRouteFuture.present();
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Home'),
+            ),
+          ],
         ),
-        body: Column(children: [
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                child: const Text('Dates'),
-                style: ElevatedButton.styleFrom(elevation: 8.0),
-                onPressed: () {
-                  _restorableDateRangePickerRouteFuture.present();
-                },
-              ),
-              ElevatedButton(
-                // Within the SecondScreen widget
-                onPressed: () {
-                  // Navigate back to the first screen by popping the current route
-                  // off the stack.
-                  Navigator.pop(context);
-                },
-                child: const Text('Home'),
-              ),
-            ],
-          ),
-          chartData.isNotEmpty
-              ? Container(height: 200, child: SimpleBarChart.withSampleData(chartData))
-              : const SizedBox.shrink(),
-          const Text(
-            'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors. ',
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.visible,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ]));
+        chartData.isNotEmpty
+            ? Container(
+                height: 200, child: SimpleBarChart.withData(chartData))
+            : const SizedBox.shrink(),
+        const Text(
+          'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors. ',
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.visible,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ])
+    );
   }
 }
