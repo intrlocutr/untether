@@ -37,13 +37,14 @@ class SimpleBarChart extends StatelessWidget {
 
   static List<charts.Series<Report, String>> _translateData(List<Report> data) {
     List<double> scores = data.map((r) => r.score).toList()..sort();
-    var colors = charts.MaterialPalette.blue.makeShades(scores.length);
+    var blueShades = charts.MaterialPalette.blue.makeShades(scores.length);
+    var grayShades = charts.MaterialPalette.gray.makeShades(scores.length);
     return [
       charts.Series<Report, String>(
         id: 'Report',
         colorFn: (Report report, _) => report.externalFactor
-            ? charts.MaterialPalette.black
-            : colors[scores.indexOf(report.score)],
+            ? grayShades[scores.indexOf(report.score)]
+            : blueShades[scores.indexOf(report.score)],
         domainFn: (Report report, _) =>
             '${report.timestamp.month}/${report.timestamp.day}',
         measureFn: (Report report, _) => report.usageMinutes,
@@ -150,7 +151,7 @@ class _ReportPageState extends State<ReportPage> with RestorationMixin {
               height: 200, child: SimpleBarChart.withData(chartData))
               : const SizedBox.shrink(),
           const Text(
-            'The lighter colors reflect better moods as inferred from the survey. Black represents a day with heavy external factors.',
+            'The lighter colors reflect better moods as inferred from the survey. Gray represents a day with heavy external factors.',
             textAlign: TextAlign.center,
             overflow: TextOverflow.visible,
             style: TextStyle(fontWeight: FontWeight.bold),
